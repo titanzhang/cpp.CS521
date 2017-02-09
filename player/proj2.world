@@ -1,0 +1,51 @@
+
+include "map.inc"
+
+window
+( 
+  size [ 755.000 684.000 ] 
+  center [-6 1.5] 
+  scale 41.472 # pixels per meter
+
+  show_data 1
+  show_clock 1
+)
+
+floorplan
+( 
+  bitmap "hospital_section.png" 
+  map_resolution 0.02
+  size [40.000 17.000 0.6] 
+  name "hospital"
+  color "gray50"
+  gui_grid 1
+  gui_outline 1
+)
+
+
+define myrobot position
+(
+  drive "diff"
+  origin [0 0 0 0]
+  gui_nose 1
+  ranger_return 1
+
+  size [0.4 0.3 0.1]
+  # simplified Body shape:
+  block(
+    points 8
+    point[0] [-0.05 0.03]
+    point[1] [-0.05 -0.03]
+    point[2] [-0.03 -0.06 ]
+
+    point[3] [0.03 -0.06]
+    point[4] [0.05 -0.03]
+    point[5] [0.05 0.03]
+    point[6] [0.03 0.06]
+    point[7] [-0.03 0.06]
+    z [0 0.1]
+  )
+)
+
+myrobot( color "red" name "r1" pose [-10.071 3.186 0 -722.333])
+
