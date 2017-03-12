@@ -10,10 +10,12 @@ namespace Robot {
 		static const int CLOSE_TO_LEFT;
 		static const int CLOSE_TO_RIGHT;
 
+		PerceptualSchema(PlayerCc::Position2dProxy * pPP, PlayerCc::RangerProxy * pRP);
 		PerceptualSchema(PlayerCc::Position2dProxy * pPP, PlayerCc::RangerProxy * pRP, Coordinate goal);
 		Coordinate getCurrentCoordiniate();
 		double getCurrentDirection();
 		Coordinate getGoal();
+		void setGoal(Coordinate goal);
 		RangerReading getRangerReading();
 		Pose getTargetPos();
 		bool nearObstacle(double maxDistance);

@@ -6,6 +6,7 @@ namespace Robot {
 	const int PerceptualSchema::CLOSE_TO_RIGHT = 2;
 
 	PerceptualSchema::PerceptualSchema(PlayerCc::Position2dProxy * pPP, PlayerCc::RangerProxy * pRP, Coordinate goal): pPosProxy(pPP), pRangerProxy(pRP), mGoal(goal) { }
+	PerceptualSchema::PerceptualSchema(PlayerCc::Position2dProxy * pPP, PlayerCc::RangerProxy * pRP): pPosProxy(pPP), pRangerProxy(pRP) { }
 
 	Coordinate PerceptualSchema::getCurrentCoordiniate() {
 		return Coordinate(pPosProxy->GetXPos(), pPosProxy->GetYPos());
@@ -17,6 +18,10 @@ namespace Robot {
 
 	Coordinate PerceptualSchema::getGoal() {
 		return mGoal;
+	}
+
+	void PerceptualSchema::setGoal(Coordinate goal) {
+		mGoal = goal;
 	}
 
 	RangerReading PerceptualSchema::getRangerReading() {

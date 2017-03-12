@@ -1,0 +1,35 @@
+
+include "pioneer.inc"
+include "map.inc"
+
+window
+( 
+  size [ 1300.000 600.000 ] # in pixels
+  scale 30   # pixels per meter
+  center [ 0  0 ]
+  rotate [ 0  0 ]
+
+  show_grid 0
+  show_data 1
+  show_clock 1
+)
+
+floorplan
+( 
+  name "hospital_section"
+  size [40.000 18.000 0.800]
+  pose [0 0 0 0]
+  bitmap "hospital_section.png"
+
+  gui_grid 1
+  gui_outline 1
+)
+
+
+pioneer2dx_front_sonar
+(
+  color "red"
+  name "r1"
+  pose [-10.071 3.186 0 -722.333]
+)
+

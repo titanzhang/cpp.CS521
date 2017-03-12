@@ -46,7 +46,7 @@ namespace Robot {
 
 		result.yaw = std::min(angleGoal, MOTOR_MAX_TRUNRATE);
 		result.yaw = std::max(result.yaw, -MOTOR_MAX_TRUNRATE);
-		if (std::fabs(angleGoal) < PI/2) {
+		if (std::fabs(angleGoal) < PI/6) {
 			result.speed = MOTOR_MAX_SPEED * action.speed;
 		}
 

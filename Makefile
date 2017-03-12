@@ -6,24 +6,38 @@ AR = ar rvs
 SRC = source/
 BIN = build/
 
-LIBS = Primitives Logger PerceptualSchema PFields Behavior
+LIBS = Primitives Logger GridMap WaveFront Navigator Pilot Act Behavior PerceptualSchema PFields
 LIBOBJ = $(addsuffix .o, $(addprefix $(BIN), $(LIBS)))
 
-all: robot
+all: robot test
 
 # Robot
-robot: buildenv $(BIN)proj3
-$(BIN)proj3: $(LIBOBJ) $(BIN)proj3.o
-	$(CC) $(LIBOBJ) $(BIN)proj3.o -o $(BIN)proj3 $(LDFLAGS)
+robot: buildenv $(BIN)proj4
+$(BIN)proj4: $(LIBOBJ) $(BIN)proj4.o
+	$(CC) $(LIBOBJ) $(BIN)proj4.o -o $(BIN)proj4 $(LDFLAGS)
+
+# ScaleMap
+tools: buildenv $(BIN)scaleMap
+$(BIN)scaleMap: $(BIN)scaleMap.o
+	$(CC) $(BIN)scaleMap.o -o $(BIN)scaleMap
+
+# test
+test: buildenv $(BIN)test
+$(BIN)test: $(LIBOBJ) $(BIN)test.o
+	$(CC) $(LIBOBJ) $(BIN)test.o -o $(BIN)test $(LDFLAGS)
 
 # Compile any .o files
 $(BIN)%.o: $(SRC)%.cpp
 	$(CC) $(CFLAGS) $< -o $@
 
 # The build directory
-buildenv: $(BIN)
+buildenv: $(BIN) $(BIN)hospital_section.pnm
 $(BIN):
 	mkdir -p $(BIN)
+	cp player/hospital_section.pnm $(BIN)
+
+$(BIN)hospital_section.pnm:
+	cp player/hospital_section.pnm $(BIN)
 
 # Clean
 clean:
