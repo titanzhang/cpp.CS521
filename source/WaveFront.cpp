@@ -16,11 +16,11 @@ namespace Robot {
 			return wayPoints;
 		}
 
-		bool WaveFront::calculatePath() {
-			numWaypoints = 0;
+		bool WaveFront::propagation() {
 			GridCoordinate startGrid = pMap->coordinateToGrid(start);
 			GridCoordinate endGrid = pMap->coordinateToGrid(end);
 
+			// BFS propagation
 			std::queue<WaveValue> queue;
 			std::set<int> set;
 			queue.push(WaveValue(startGrid, 2));
@@ -46,26 +46,26 @@ namespace Robot {
 
 						set.insert(neighborIndex);
 						queue.push(WaveValue(neighbor, v.v + 1));
-						// std::cout << "Push: " << neighbor.toString() << std::endl;
 					}
 				}
 			}
 
-			if (pMap->getValue(endGrid) <= 1) return false;
+			// Can not reach target
+			return (pMap->getValue(endGrid) > 1);
+		}
 
-			// Generate way points
+		void WaveFront::generateWaypoints(GridCoordinate * wp, int& numWp) {
+			GridCoordinate startGrid = pMap->coordinateToGrid(start);
+			GridCoordinate endGrid = pMap->coordinateToGrid(end);
 			std::queue<GridCoordinate> wpQueue;
 
+			// Extract way points
 			GridCoordinate g = endGrid;
 			while (!(g == startGrid)) {
 				wpQueue.push(g);
 				g = getNextWP(g);
 			}
-
-			// Path relaxation
-			int numWp = wpQueue.size(), numWpSmooth;
-			GridCoordinate * wp = new GridCoordinate[numWp];
-			GridCoordinate * wpSmooth = new GridCoordinate[numWp];
+			numWp = wpQueue.size();
 
 			// Flip the order of way points
 			int i = numWp - 1;
@@ -73,8 +73,23 @@ namespace Robot {
 				wp[i --] = wpQueue.front();
 				wpQueue.pop();
 			}
+		}
+
+
+		bool WaveFront::calculatePath() {
+			// Wave front popagation
+			if (!propagation()) {
+				return false;
+			}
+
+			// Generate way points
+			GridCoordinate * wp = new GridCoordinate[MAX_WAYPOINTS];
+			int numWp = MAX_WAYPOINTS;
+			generateWaypoints(wp, numWp);
 
 			// Recusively smooth path
+			int numWpSmooth = numWp;
+			GridCoordinate * wpSmooth = new GridCoordinate[numWpSmooth];
 			while (smooth(wp, numWp, wpSmooth, numWpSmooth)) {
 				numWp = numWpSmooth;
 				GridCoordinate * p = wp;
@@ -84,7 +99,7 @@ namespace Robot {
 
 			// Save way points
 			numWaypoints = 0;
-			for (i = 0; i < numWpSmooth; i ++) {
+			for (int i = 0; i < numWpSmooth; i ++) {
 				wayPoints[numWaypoints ++] = wpSmooth[i];
 				Logger::debug("WaveFront", wpSmooth[i].toString());
 			}
@@ -99,49 +114,27 @@ namespace Robot {
 			char nextValue = pMap->getValue(current) - 1;
 			int x = current.x, y = current.y;
 
+			// Order the list to try to go straight line
 			GridCoordinate nodeList[] = {
-				GridCoordinate(x-1, y-1), GridCoordinate(x, y-1), GridCoordinate(x+1, y-1),
-				GridCoordinate(x+1, y), 
-				GridCoordinate(x+1, y+1), GridCoordinate(x, y+1), GridCoordinate(x-1, y+1),
-				GridCoordinate(x-1, y)
+				GridCoordinate(x-1, y), GridCoordinate(x+1, y),
+				GridCoordinate(x, y-1), GridCoordinate(x, y+1), 
+				GridCoordinate(x+1, y+1), GridCoordinate(x-1, y+1),
+				GridCoordinate(x+1, y-1), GridCoordinate(x-1, y-1)
 			};
 
-			while (pMap->getValue(nodeList[0]) == nextValue) {
-				GridCoordinate g = nodeList[0];
-				for (int i = 1; i < 8; i ++) {
-					nodeList[i - 1] = nodeList[i];
-				}
-				nodeList[7] = g;
-			}
-
-			int numCandidate = 0;
-			GridCoordinate candidateList[8];
+			int minObstacle = 8;
+			GridCoordinate selected;
 			for (int i = 0; i < 8; i ++) {
 				if (pMap->getValue(nodeList[i]) == nextValue) {
-					candidateList[numCandidate ++] = nodeList[i];
+					int density = pMap->getObstacleDensity(nodeList[i]);
+					if (density < minObstacle) { // select a node with less obstacles nearby
+						minObstacle = density;
+						selected = nodeList[i];
+					}
 				}
 			}
 
-			float weightDistance = 0.1, weightObstacle = 0.9;
-			float mid = numCandidate / 2.0 - 0.5;
-			float highestScore = 0;
-			int selected = 0;
-			for (int i = 0; i < numCandidate; i ++) {
-				// Distance score
-				float distance = std::fabs(mid - i);
-				float scoreDistance = (mid - distance) / mid;
-				// Obstacle score
-				float scoreObstacle = (8 - pMap->getObstacleDensity(candidateList[i])) / 8.0;
-				// Total score
-				float score = scoreDistance * weightDistance + scoreObstacle * weightObstacle;
-
-				if (score > highestScore) {
-					highestScore = score;
-					selected = i;
-				}
-			}
-
-			return candidateList[selected];
+			return selected;
 		}
 
 		bool WaveFront::smooth(GridCoordinate * wp, int num, GridCoordinate * wpSmooth, int& numSmooth) {
@@ -226,6 +219,32 @@ namespace Robot {
 					if (pMap->getValue(node) == 1) return true;
 					node.x += stepX;
 					node.y += stepY;
+				}
+				return false;
+			}
+
+			if (std::abs(dx) == 1) {
+				if (y1 > y2) {
+					x1 += x2; x2 = x1 - x2; x1 = x1 - x2; // swap x1 and x2
+					y1 += y2; y2 = y1 - y2; y1 = y1 - y2; // swap y1 and y2
+				}
+
+				for (int y = y1 + 1; y <= y2 - 1; y ++) {
+					if (pMap->getValue(GridCoordinate(x1, y)) == 1) return true;
+					if (pMap->getValue(GridCoordinate(x2, y)) == 1) return true;
+				}
+				return false;
+			}
+
+			if (std::abs(dy) == 1) {
+				if (x1 > x2) {
+					x1 += x2; x2 = x1 - x2; x1 = x1 - x2; // swap x1 and x2
+					y1 += y2; y2 = y1 - y2; y1 = y1 - y2; // swap y1 and y2
+				}
+
+				for (int x = x1 + 1; x <= x2 - 1; x ++) {
+					if (pMap->getValue(GridCoordinate(x, y1)) == 1) return true;
+					if (pMap->getValue(GridCoordinate(x, y2)) == 1) return true;
 				}
 				return false;
 			}

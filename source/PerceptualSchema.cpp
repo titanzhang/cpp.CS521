@@ -2,7 +2,7 @@
 
 namespace Robot {
 
-	const int PerceptualSchema::PerceptualSchema::CLOSE_TO_LEFT = 1;
+	const int PerceptualSchema::CLOSE_TO_LEFT = 1;
 	const int PerceptualSchema::CLOSE_TO_RIGHT = 2;
 
 	PerceptualSchema::PerceptualSchema(PlayerCc::Position2dProxy * pPP, PlayerCc::RangerProxy * pRP, Coordinate goal): pPosProxy(pPP), pRangerProxy(pRP), mGoal(goal) { }
@@ -66,11 +66,11 @@ namespace Robot {
 	}
 
 	bool PerceptualSchema::nearTarget() {
-		return (getTargetPos().speed < 0.5); 
+		return (getTargetPos().speed < 0.2); 
 	}
 
 	bool PerceptualSchema::reachTarget() {
-		double reachDistance = 0.05;
+		double reachDistance = 0.08;
 		return mGoal.distanceTo(getCurrentCoordiniate()) < reachDistance;
 	}
 

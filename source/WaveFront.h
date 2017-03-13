@@ -17,13 +17,15 @@ namespace Robot {
 		GridMap * pMap;
 		Coordinate start;
 		Coordinate end;
-		static const int MAX_WAYPOINTS = 500;
+		static const int MAX_WAYPOINTS = 1000;
 		int numWaypoints;
 		GridCoordinate wayPoints[MAX_WAYPOINTS];
 
 		GridCoordinate getNextWP(GridCoordinate current);
 		bool smooth(GridCoordinate * wp, int num, GridCoordinate * wpSmooth, int& numSmooth);
 		bool hasObstacle(GridCoordinate wp1, GridCoordinate wp2);
+		bool propagation();
+		void generateWaypoints(GridCoordinate * wp, int& numWp);
 	};
 
 	class WaveValue {

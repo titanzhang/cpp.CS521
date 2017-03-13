@@ -23,7 +23,7 @@ namespace Robot {
 		perceptualSchma.setGoal(mTarget);
 
     Pose gotoResult, avoidResult, combinedResult;
-    double avoidDistance = 0.6;
+    double avoidDistance = 0.4;
     double dangerousDistance = 0.2;
 
     // Releasers

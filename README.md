@@ -1,4 +1,4 @@
-# CS521-P3
+# CS521-P4
 
 ### How to compile?
 ```
@@ -7,10 +7,10 @@ make all
 
 ### How to start the Player/Stage?
 ```
-player player/proj3.cfg
+player player/proj4.cfg
 ```
 
 ### How to run the robot?
 ```
-build/proj3 <target x> <target y>
+build/proj4 <target x> <target y>
 ```
