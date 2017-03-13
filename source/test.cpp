@@ -5,13 +5,20 @@
 using namespace Robot;
 
 int main(int argc, char **argv) {
+	if (argc < 5) {
+		std::cout << "Parameters: <output file> <target_x> <target_y> <skip smooth(0/1)>" << std::endl;
+		return -1;
+	}
+
 	std::string directory = argv[0];
 	int find = directory.find_last_of('/');
 	directory = (find == std::string::npos)? "": directory.substr(0, find+1);
 	std::string fileName = directory + "hospital_section.pnm";
+
 	std::string outFileName = argv[1];
 	float x = atof(argv[2]);
 	float y = atof(argv[3]);
+	int skip = atoi(argv[4]);
 	Coordinate target(x, y);
 
 	GridMap map;
@@ -24,6 +31,7 @@ int main(int argc, char **argv) {
 
 
 	WaveFront planner(Coordinate(-10.071, 3.186), target, &map);
+	planner.skipSmooth((skip != 0));
 	if (!planner.calculatePath()) {
 		std::cout << "No solution!" << std::endl;
 	} else {
@@ -37,6 +45,8 @@ int main(int argc, char **argv) {
 
 		planner.markPath();
 		map.writeToFile(outFileName);
+
+		return 1;
 	}
 
 }

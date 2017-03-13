@@ -185,6 +185,8 @@ namespace Robot {
 		// }
 
 		bool WaveFront::hasObstacle(GridCoordinate wp1, GridCoordinate wp2) {
+			if (bSkipSmooth) return true;
+
 			int x1 = wp1.x, y1 = wp1.y;
 			int x2 = wp2.x, y2 = wp2.y;
 			int dx = x2 - x1, dy = y2 - y1;
@@ -256,6 +258,10 @@ namespace Robot {
 			for (int i = 0; i < numWaypoints; i ++) {
 				pMap->setValue(wayPoints[i], -20);
 			}
+		}
+
+		void WaveFront::skipSmooth(bool skip) {
+			bSkipSmooth = skip;
 		}
 
 }

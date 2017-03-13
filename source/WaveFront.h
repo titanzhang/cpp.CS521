@@ -12,6 +12,7 @@ namespace Robot {
 		bool calculatePath();
 		GridCoordinate * getWaypoints(int * size);
 		void markPath();
+		void skipSmooth(bool skip);
 
 	private:
 		GridMap * pMap;
@@ -20,6 +21,7 @@ namespace Robot {
 		static const int MAX_WAYPOINTS = 1000;
 		int numWaypoints;
 		GridCoordinate wayPoints[MAX_WAYPOINTS];
+		bool bSkipSmooth = false;
 
 		GridCoordinate getNextWP(GridCoordinate current);
 		bool smooth(GridCoordinate * wp, int num, GridCoordinate * wpSmooth, int& numSmooth);
